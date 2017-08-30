@@ -35,10 +35,12 @@ var models1    = require('./models/user')(app, mongoose);
 var models2    = require('./models/poll')(app, mongoose);
 var models3    = require('./models/vote')(app, mongoose);
 var models4    = require('./models/friend')(app, mongoose);
+var models5    = require('./models/pending-vote')(app, mongoose);
 var userCtrl = require('./controllers/users');
 var pollCtrl = require('./controllers/polls');
 var voteCtrl = require('./controllers/votes');
 var friendCtrl = require('./controllers/friends');
+var pendingCtrl = require('./controllers/pending-vote');
 
 
 //// USER ROUTER ////////////////////////////////////////////////////
@@ -86,16 +88,25 @@ app.use('/vote', votes);
 //// FRIENDS /////////////////////////////////////////////////////////
 var friends = express.Router();
 
-votes.route('/add')
-  .post(friendCtrl.addFriend);
+app.post('/friend/add', friendCtrl.addFriend);
+app.get('/friend', friendCtrl.findAllFriends);
 
-votes.route('')
-  .get(friendCtrl.findAllFriends);
 
 app.get('/friend/:id', friendCtrl.searchFriends)
 
 app.use('/friend', friends);
 
+//// VOTOS PENDIENTES /////////////////////////////////////////////////////////
+var pending = express.Router();
+
+app.post('/pending/add', pendingCtrl.addPending);
+app.post('/pending/delete', pendingCtrl.deletePending);
+app.get('/pending', pendingCtrl.findAllPending);
+
+
+app.get('/pending/:id', pendingCtrl.searchPending)
+
+app.use('/pending', pending);
 
 // Start server
 app.listen(3000, function() {

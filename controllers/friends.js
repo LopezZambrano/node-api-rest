@@ -28,27 +28,25 @@ exports.addFriend = function (req, res) {
 
     var friendNew = new Friend({
         idUser: req.body.idUser,
-        idFriends: req.body.idFriends,
+        idFriends: req.body.idFriend,
     });
 
-    Friend.findOne({idUser: req.body.idUser}, function (err, friend) {
+    Friend.findOne({ idUser: req.body.idUser }, function (err, friend) {
         if (err) return res.send(500, err.message);
         if (friend == null) {
-            console.log('NO ENCUENTRO AMIGOS')
             friendNew.save(function (err, friendNew) {
                 if (err) return res.send(500, err.message);
                 res.status(200).jsonp(friendNew);
             });
         } else {
-            console.log('ENCUENTRO AMIGOS')
-            friend.idUser = req.body.idUser;
-            friend.options = req.body.idFriends;
-
-            friend.save(function (err){
-                if (err) return res.send(500, err.message);
-                res.status(200).jsonp(friend);
-            });
-
+            if (friend.idFriends.indexOf(req.body.idFriend) === -1) {
+                Friend.findOneAndUpdate({ idUser: req.body.idUser }, { $push: { idFriends: req.body.idFriend } }, function (err, friend) {
+                    if (err) return res.send(500, err.message);
+                    res.status(200).jsonp(friendNew);
+                });
+            } else {
+                res.status(200);
+            }
         }
     });
 };
@@ -57,12 +55,12 @@ exports.addFriend = function (req, res) {
 //GET - Search FRIENDS in the DB
 exports.searchFriends = function (req, res) {
     console.log('GET FRIENDS');
-	console.log(req.params.id)
+    console.log(req.params.id)
 
-    Friend.find({idUser: req.params.id}, function (err, friend) {
-		console.log(friend)
+    Friend.find({ idUser: req.params.id }, function (err, friend) {
+        console.log(friend)
         if (err) return res.send(500, err.message);
-        if (friend !== null){
+        if (friend !== null) {
             console.log("OK")
             res.status(200).jsonp(friend);
         } else {

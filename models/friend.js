@@ -1,11 +1,9 @@
-var mongoose = require('mongoose'),  
-    Schema   = mongoose.Schema;
+var mongoose = require('mongoose'),  Schema   = mongoose.Schema;
+var user = require('./user.js');
 
 var friendSchema = new Schema({  
   idUser:     { type: String },
-  idFriends:  { type: mongoose.Schema.Types.ObjectId,
-                ref: 'user'
-               }
+  idFriends:  [{ type: Schema.Types.ObjectId, ref: 'user'}]
 });
 
 module.exports = mongoose.model('friend', friendSchema);
