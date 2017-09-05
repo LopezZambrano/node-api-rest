@@ -33,25 +33,25 @@ exports.addUser = function (req, res) {
         password: req.body.password
     });
 
-     User.findOne({name: req.body.name}, function (err, user) {
+    User.findOne({ name: req.body.name }, function (err, user) {
         if (err) return res.send(500, err.message);
-        if (user != null){
+        if (user != null) {
             res.status(401).jsonp();
         } else {
-            User.findOne({email: req.body.email}, function (err, user) {
+            User.findOne({ email: req.body.email, name: req.body.name }, function (err, user) {
                 if (err) return res.send(500, err.message);
-                if (user == null){
+                if (user == null) {
                     userNew.save(function (err, userNew) {
-                    if (err) return res.send(500, err.message);
-                    res.status(200).jsonp(userNew);
-                }); 
+                        if (err) return res.send(500, err.message);
+                        res.status(200).jsonp(userNew);
+                    });
                 } else {
                     console.log("Error")
                     res.status(400).jsonp(userNew);
                 }
             });
         }
-     });
+    });
 
 
 };
@@ -61,15 +61,41 @@ exports.searchUser = function (req, res) {
     console.log('POST LOGIN');
     console.log(req.body);
 
-    User.findOne({email: req.body.email, password: req.body.password }, function (err, user) {
+    User.findOne({ email: req.body.email, password: req.body.password }, function (err, user) {
         if (err) return res.send(500, err.message);
-        if (user !== null){
+        if (user !== null) {
             console.log("OK")
             res.status(200).jsonp(user);
         } else {
             console.log("Error")
             res.status(401).jsonp(user);;
         }
+    });
+};
+
+//PUT - Update a register already exists
+exports.updateUser = function (req, res) {
+    User.findById(req.params.id, function (err, user) {
+        user.name = req.body.name,
+        user.email = req.body.email,
+        user.password = req.body.password
+        user.photo = req.body.password
+
+        User.findOne({ name: req.body.name }, function (err, user) {
+            if (err) return res.send(500, err.message);
+            if (user == null) {
+                console.log("OK")
+                user.save(function (err) {
+                    if (err) return res.send(500, err.message);
+                    res.status(200).jsonp(user);
+                });
+            } else {
+                console.log("Error")
+                res.status(401).jsonp(user);;
+            }
+        });
+
+
     });
 };
 

@@ -79,7 +79,7 @@ exports.searchPending = function (req, res) {
     console.log('GET PENDING');
     console.log(req.params.id)
 
-    Pending.find({ idPoll: req.params.id }, function (err, pending) {
+    Pending.find({ idUser: req.params.id }, function (err, pending) {
 
         if (err) return res.send(500, err.message);
         if (pending !== null) {

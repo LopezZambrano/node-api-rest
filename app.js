@@ -36,11 +36,13 @@ var models2    = require('./models/poll')(app, mongoose);
 var models3    = require('./models/vote')(app, mongoose);
 var models4    = require('./models/friend')(app, mongoose);
 var models5    = require('./models/pending-vote')(app, mongoose);
+var models6    = require('./models/send-vote')(app, mongoose);
 var userCtrl = require('./controllers/users');
 var pollCtrl = require('./controllers/polls');
 var voteCtrl = require('./controllers/votes');
 var friendCtrl = require('./controllers/friends');
 var pendingCtrl = require('./controllers/pending-vote');
+var sendCtrl = require('./controllers/send-vote');
 
 
 //// USER ROUTER ////////////////////////////////////////////////////
@@ -107,6 +109,18 @@ app.get('/pending', pendingCtrl.findAllPending);
 app.get('/pending/:id', pendingCtrl.searchPending)
 
 app.use('/pending', pending);
+
+//// VOTOS ENVIADOS /////////////////////////////////////////////////////////
+var send = express.Router();
+
+app.post('/send/add', sendCtrl.addSend);
+app.post('/send/delete', sendCtrl.deleteSend);
+app.get('/send', sendCtrl.findAllSend);
+
+
+app.get('/send/:id', sendCtrl.searchSend)
+
+app.use('/send', send);
 
 // Start server
 app.listen(3000, function() {
