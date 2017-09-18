@@ -54,6 +54,9 @@ users.route('/login')
 users.route('/register')
   .post(userCtrl.addUser)
 
+app.put('/user/:id', userCtrl.updateUser)
+app.get('/user/delete/:id', userCtrl.deleteUser)
+
 users.route('')
   .get(userCtrl.findAllUsers)
 
@@ -123,6 +126,6 @@ app.get('/send/:id', sendCtrl.searchSend)
 app.use('/send', send);
 
 // Start server
-app.listen(3000, function() {
+app.listen(3000, '192.168.1.13', function() {
   console.log("Node server running on http://localhost:3000");
 });

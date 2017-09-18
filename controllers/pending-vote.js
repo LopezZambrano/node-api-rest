@@ -50,7 +50,7 @@ exports.addPending = function (req, res) {
     });
 };
 
-//POST - Insert a new USER in the DB
+//POST - Delete in the DB
 exports.deletePending = function (req, res) {
     console.log('POST DELETE');
     console.log(req.body);

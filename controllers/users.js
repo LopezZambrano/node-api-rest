@@ -1,6 +1,8 @@
 
 var mongoose = require('mongoose');
 var User = mongoose.model('user');
+var service = require('../app.js');
+var fieldEncryption = require('mongoose-field-encryption')
 
 //GET - Return all users in the DB
 exports.findAllUsers = function (req, res) {
@@ -24,6 +26,7 @@ exports.findById = function (req, res) {
 
 //POST - Insert a new USER in the DB
 exports.addUser = function (req, res) {
+
     console.log('POST REGISTER');
     console.log(req.body);
 
@@ -37,22 +40,28 @@ exports.addUser = function (req, res) {
         if (err) return res.send(500, err.message);
         if (user != null) {
             res.status(401).jsonp();
+            console.log('ya hay usuario con este nombre')
         } else {
-            User.findOne({ email: req.body.email, name: req.body.name }, function (err, user) {
+        
+            User.findOne({ email: req.body.email }, function (err, user) {
                 if (err) return res.send(500, err.message);
+                
                 if (user == null) {
+                    console.log('intento guardar', userNew)
                     userNew.save(function (err, userNew) {
+                        
                         if (err) return res.send(500, err.message);
                         res.status(200).jsonp(userNew);
+                        console.log('guardar', userNew)
                     });
                 } else {
+                    console.log('ya hay usuario con este email')
                     console.log("Error")
                     res.status(400).jsonp(userNew);
                 }
             });
         }
     });
-
 
 };
 
@@ -61,14 +70,20 @@ exports.searchUser = function (req, res) {
     console.log('POST LOGIN');
     console.log(req.body);
 
+    req.body.password = fieldEncryption.encrypt(String(req.body.password), '0470808');
+    
+/*    var decrypted = fieldEncryption.decrypt('76b1f05eee14c87b', '0470808')
+    console.log(decrypted)*/
+
     User.findOne({ email: req.body.email, password: req.body.password }, function (err, user) {
         if (err) return res.send(500, err.message);
         if (user !== null) {
             console.log("OK")
-            res.status(200).jsonp(user);
+            res.status(200).jsonp(user)
+
         } else {
             console.log("Error")
-            res.status(401).jsonp(user);;
+            res.status(401).jsonp();;
         }
     });
 };
@@ -76,48 +91,48 @@ exports.searchUser = function (req, res) {
 //PUT - Update a register already exists
 exports.updateUser = function (req, res) {
     User.findById(req.params.id, function (err, user) {
-        user.name = req.body.name,
-        user.email = req.body.email,
-        user.password = req.body.password
-        user.photo = req.body.password
 
-        User.findOne({ name: req.body.name }, function (err, user) {
-            if (err) return res.send(500, err.message);
-            if (user == null) {
-                console.log("OK")
-                user.save(function (err) {
-                    if (err) return res.send(500, err.message);
-                    res.status(200).jsonp(user);
-                });
-            } else {
-                console.log("Error")
-                res.status(401).jsonp(user);;
-            }
-        });
+        console.log(req.body.name)
 
+        if (req.body.name !== null) {
+            user.name = req.body.name,
+            user.password = req.body.password
 
+            User.findOne({ name: req.body.name }, function (err, userFind) {
+                if (err) return res.send(500, err.message);
+                if (userFind == null) {
+                    console.log("No hay usuario con este nombre")
+                    user.save(function (err) {
+                        if (err) return res.send(500, err.message);
+                        res.status(200).jsonp(user);
+                    });
+                } else {
+                    console.log("Error")
+                    res.status(401).jsonp(userFind);
+                }
+            });
+        } else {
+
+            console.log('No cambia nombre')
+            user.password = req.body.password
+
+            user.save(function (err) {
+                if (err) return res.send(500, err.message);
+                res.status(200).jsonp(user);
+            });
+        }
     });
 };
 
-/*//PUT - Update a register already exists
-exports.updateTVShow = function (req, res) {
+//POST - Delete in the DB
+exports.deleteUser = function (req, res) {
+    console.log(' DELETE');
+    console.log(req.params.id)
     User.findById(req.params.id, function (err, user) {
-        user.name = req.body.name;
-        user.password = req.body.password
-
-        user.save(function (err) {
-            if (err) return res.send(500, err.message);
-            res.status(200).jsonp(tvshow);
-        });
-    });
-};
-
-//DELETE - Delete a TVShow with specified ID
-exports.deleteTVShow = function (req, res) {
-    User.findById(req.params.id, function (err, user) {
+        console.log(user)
         user.remove(function (err) {
             if (err) return res.send(500, err.message);
-            res.status(200);
+            res.status(200).jsonp(user);
         })
     });
-};*/
+}

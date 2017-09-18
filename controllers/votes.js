@@ -24,8 +24,7 @@ exports.findById = function (req, res) {
 //POST - Insert a new USER in the DB
 exports.addVote = function (req, res) {
     console.log('POST AÑADIR VOTO');
-    console.log(req.body);
-
+  
     var voteNew = new Vote({
         idPoll: req.body.idPoll,
         options: req.body.options,
@@ -41,8 +40,12 @@ exports.addVote = function (req, res) {
             });
         } else {
             console.log('ENCUENTRO VOTOS')
+
+            var idUser = req.body.idUser;
+
             vote.idPoll = req.body.idPoll;
             vote.options = req.body.options;
+            
 
             vote.save(function (err){
                 if (err) return res.send(500, err.message);
