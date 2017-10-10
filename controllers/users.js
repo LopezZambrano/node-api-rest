@@ -42,14 +42,14 @@ exports.addUser = function (req, res) {
             res.status(401).jsonp();
             console.log('ya hay usuario con este nombre')
         } else {
-        
+
             User.findOne({ email: req.body.email }, function (err, user) {
                 if (err) return res.send(500, err.message);
-                
+
                 if (user == null) {
                     console.log('intento guardar', userNew)
                     userNew.save(function (err, userNew) {
-                        
+
                         if (err) return res.send(500, err.message);
                         res.status(200).jsonp(userNew);
                         console.log('guardar', userNew)
@@ -71,9 +71,9 @@ exports.searchUser = function (req, res) {
     console.log(req.body);
 
     req.body.password = fieldEncryption.encrypt(String(req.body.password), '0470808');
-    
-/*    var decrypted = fieldEncryption.decrypt('76b1f05eee14c87b', '0470808')
-    console.log(decrypted)*/
+
+    /*    var decrypted = fieldEncryption.decrypt('76b1f05eee14c87b', '0470808')
+        console.log(decrypted)*/
 
     User.findOne({ email: req.body.email, password: req.body.password }, function (err, user) {
         if (err) return res.send(500, err.message);
@@ -90,37 +90,47 @@ exports.searchUser = function (req, res) {
 
 //PUT - Update a register already exists
 exports.updateUser = function (req, res) {
+
     User.findById(req.params.id, function (err, user) {
 
-        console.log(req.body.name)
+        console.log('password', user.password)
 
-        if (req.body.name !== null) {
-            user.name = req.body.name,
-            user.password = req.body.password
+        if (user.password === req.body.password) {
 
-            User.findOne({ name: req.body.name }, function (err, userFind) {
-                if (err) return res.send(500, err.message);
-                if (userFind == null) {
-                    console.log("No hay usuario con este nombre")
-                    user.save(function (err) {
-                        if (err) return res.send(500, err.message);
-                        res.status(200).jsonp(user);
-                    });
-                } else {
-                    console.log("Error")
-                    res.status(401).jsonp(userFind);
-                }
-            });
+            if (req.body.newName !== null && req.body.newName !== '') {
+
+                user.name = req.body.newName,
+
+                User.findOne({ name: req.body.newName }, function (err, userFind) {
+                    if (err) return res.send(500, err.message);
+                    console.log('userFind',userFind)
+                    if (userFind == null) {
+                        console.log("No hay usuario con este nombre")
+                        user.save(function (err) {
+                            if (err) return res.send(500, err.message);
+                            res.status(200).jsonp(user);
+                        });
+                    } else {
+                        console.log("Error")
+                        res.status(401).jsonp();
+                    }
+                });
+            } else {
+
+                console.log('No cambia nombre')
+                user.password = fieldEncryption.encrypt(String(req.body.newPassword), '0470808');
+
+                user.save(function (err) {
+                    if (err) return res.send(500, err.message);
+                    res.status(200).jsonp(user);
+                });
+            }
+
         } else {
-
-            console.log('No cambia nombre')
-            user.password = req.body.password
-
-            user.save(function (err) {
-                if (err) return res.send(500, err.message);
-                res.status(200).jsonp(user);
-            });
+            console.log("Error")
+            res.status(402).jsonp();
         }
+
     });
 };
 

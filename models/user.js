@@ -7,7 +7,6 @@ var userSchema = new Schema({
   name:     { type: String },
   email: { type: String },
   password: { type: String },
-  photo : { type: String },
 });
 
 userSchema.plugin(mongooseEncryption, {fields: ['password'], secret: '0470808'});

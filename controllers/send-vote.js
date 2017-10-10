@@ -25,7 +25,6 @@ exports.findById = function (req, res) {
 //POST - Insert a new USER in the DB
 exports.addSend = function (req, res) {
     console.log('POST AÑADIR PENDINTE');
-    console.log(req.body);
 
     var sendNew = new Send({
         idUser: req.body.idUser,
@@ -42,7 +41,11 @@ exports.addSend = function (req, res) {
                 res.status(200).jsonp(sendNew);
             });
         } else {
-            res.status(200).jsonp(sendNew); 
+            console.log('no hay')
+            Send.findOneAndUpdate({ idUser: req.body.idUser }, { $push: { idPolls: req.body.idPolls } }, function (err, send) {
+                if (err) return res.send(500, err.message);
+                res.status(200).jsonp(sendNew);
+            });
         }
     });
 };
