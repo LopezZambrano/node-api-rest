@@ -126,6 +126,6 @@ app.get('/send/:id', sendCtrl.searchSend)
 app.use('/send', send);
 
 // Start server
-app.listen(3000, '192.168.1.13', function() {
+app.listen(3000, function() {
   console.log("Node server running on http://localhost:3000");
 });
